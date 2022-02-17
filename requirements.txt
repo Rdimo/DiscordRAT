@@ -1,6 +1,6 @@
-discord
-discord-py-slash-command
-discord-components
+discord==1.7.3
+discord-components==2.1.2
+discord-py-slash-command==3.0.3
 pyinstaller
 requests
 asyncio
